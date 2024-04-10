@@ -10,11 +10,14 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 
 public class UlamSpiralPanel extends JPanel {
-
+	
+	// screen stuff
 	private int screenWidth, screenHeight;
-	private double scale = 1;
-	private ArrayList<Point> primes = new ArrayList<Point>();
+	private double scale = 16;
+	// input
 	private InputHandler inputHandler;
+	
+	private ArrayList<Point> prime_points = new ArrayList<Point>(); // array holding prime points
 
 	UlamSpiralPanel(double screenWidth, double screenHeight) {
 		this.screenWidth = (int) screenWidth;
@@ -25,7 +28,8 @@ public class UlamSpiralPanel extends JPanel {
 
 		int x = 1, y = 0, i = 2, sideTimes = 1, sideLength = 1, sideTraversal = 0;
 		int direction = 1; // 0 - right, 1 - up, 2 - left, 3 - down
-		while (primes.size() < 100) {
+		while (prime_points.size() < 128) {
+			// prime checker
 			boolean prime = true;
 			for (int j = 2; j < i; j++) {
 				if (i % j == 0) {
@@ -34,10 +38,11 @@ public class UlamSpiralPanel extends JPanel {
 				}
 			}
 			if (prime == true) {
-				primes.add(new Point(x, y));
+				prime_points.add(new Point(x, y));
 			}
 			i++;
 
+			// next point
 			if (direction == 0) {
 				x++;
 			} else if (direction == 1) {
@@ -62,7 +67,8 @@ public class UlamSpiralPanel extends JPanel {
 			}
 		}
 	}
-
+	
+	// drawing sprial
 	public void paintComponent(Graphics graphics) {
 		Graphics2D g = (Graphics2D) graphics;
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -73,11 +79,12 @@ public class UlamSpiralPanel extends JPanel {
 		g.translate(screenWidth / 2, screenHeight / 2);
 
 		g.setColor(Color.WHITE);
-		for (Point prime : primes) {
-			g.fillOval((int) (prime.getX() * scale) - 1, (int) (prime.getY() * scale) - 1, 2, 2);
+		for (Point prime_point : prime_points) {
+			g.fillOval((int) (prime_point.getX() * scale) - 1, (int) (prime_point.getY() * scale) - 1, 2, 2);
 		}
 	}
-
+	
+	// zoom scale functions
 	public void zoomIn() {
 		scale *= 2;
 		repaint();
@@ -87,12 +94,15 @@ public class UlamSpiralPanel extends JPanel {
 		scale /= 2;
 		repaint();
 	}
-
+	
+	// generating more prime points
 	public void more() {
-		int newSize = primes.size() * 2;
+		int newSize = prime_points.size() * 2;
+		prime_points.clear(); // TOFIX: generate new primes without regenerating already generated primes
 		int x = 1, y = 0, i = 2, sideTimes = 1, sideLength = 1, sideTraversal = 0;
 		int direction = 1; // 0 - right, 1 - up, 2 - left, 3 - down
-		while (primes.size() < newSize) {
+		while (prime_points.size() < newSize) {
+			// prime checker
 			boolean prime = true;
 			for (int j = 2; j < i; j++) {
 				if (i % j == 0) {
@@ -101,10 +111,11 @@ public class UlamSpiralPanel extends JPanel {
 				}
 			}
 			if (prime == true) {
-				primes.add(new Point(x, y));
+				prime_points.add(new Point(x, y));
 			}
 			i++;
-
+			
+			// next point
 			if (direction == 0) {
 				x++;
 			} else if (direction == 1) {
@@ -130,15 +141,17 @@ public class UlamSpiralPanel extends JPanel {
 		}
 		repaint();
 	}
-
+	
+	// trimming prime point array
 	public void less() {
-		int newSize = primes.size() / 2;
-		while (primes.size() > newSize) {
-			primes.remove(primes.size() - 1);
+		int newSize = prime_points.size() / 2;
+		while (prime_points.size() > newSize) {
+			prime_points.remove(prime_points.size() - 1);
 		}
 		repaint();
 	}
-
+	
+	// input control
 	class InputHandler extends KeyAdapter {
 		public void keyPressed(KeyEvent e) {
 			if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
